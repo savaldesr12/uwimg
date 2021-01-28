@@ -127,10 +127,13 @@ image make_emboss_filter()
 }
 
 // Question 2.2.1: Which of these filters should we use preserve when we run our convolution and which ones should we not? Why?
-// Answer: TODO
+// Answer: We should use preserve for sharpen and emboss since we need to preserve the three colors as their output is useful for
+// sharpening an image and to style an image, respectively. On the other hand, the highpass filter is useful for finding edges so
+// there is no need to preserve the three colors of the image.
 
 // Question 2.2.2: Do we have to do any post-processing for the above filters? Which ones and why?
-// Answer: TODO
+// Answer: For all of them we do post-processing, especially clamping because we don't want the values
+// to be less than 0 or greater than 1.
 
 image make_gaussian_filter(float sigma)
 {
@@ -227,12 +230,12 @@ void feature_normalize(image im)
             }
         }
     }
-    range = min - max;
+    range = max - min;
     for (k = 0; k < im.c; k++) {
         for (i = 0; i < im.w; i++) {
             for (j = 0; j < im.h; j++) {
                 if (range) {
-                    set_pixel(im, i, j, k, (get_pixel(im, i, j, k) - min) / range);
+                    set_pixel(im, i, j, k, (get_pixel(im, i, j, k) - min) * 1.0 / range);
                 } else {
                     set_pixel(im, i, j, k, 0.0);
                 }
@@ -258,7 +261,7 @@ image *sobel_image(image im)
             nxt_gx = get_pixel(gx, i, j, 0);
             nxt_gy = get_pixel(gy, i, j, 0);
             set_pixel(magnitude, i, j, 0, sqrtf(1.0*nxt_gx*nxt_gx + 1.0*nxt_gy*nxt_gy));
-            set_pixel(theta, i, j, 0, atan2f(nxt_gx, nxt_gy));
+            set_pixel(theta, i, j, 0, atan2f(nxt_gy, nxt_gx));
         }
     }
     res_ptr[0] = magnitude;
